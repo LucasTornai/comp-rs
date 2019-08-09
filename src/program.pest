@@ -1,0 +1,68 @@
+WHITESPACE = _{ " " }
+
+program = _{ SOI ~ main_func ~ EOI }
+
+main_func = { 
+    "begin:" ~ NEWLINE* ~
+    ((str_decl | flt_decl) ~ NEWLINE*)* ~
+    "end"
+}
+
+t_id = @{
+    ASCII_ALPHA+ ~ 
+    (ASCII_DIGIT | ASCII_ALPHA)*
+}
+
+// start VARIABLES
+// :: STRING
+
+str_value = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+
+str_var = {
+    t_id ~ WHITESPACE* ~
+    ("=" ~ WHITESPACE* ~ str_value)?
+}
+
+str_decl = {
+    "str" ~ WHITESPACE* ~
+    str_var ~ ("," ~ str_var)*
+}
+
+// :: FLOAT
+
+flt_value = {
+    ("+" | "-")? ~
+    ASCII_DIGIT+ ~
+    ("." ~ ASCII_DIGIT+)?
+}
+
+flt_var = {
+    t_id ~ WHITESPACE* ~
+    ("=" ~ WHITESPACE* ~ expr)?
+}
+
+flt_decl = {
+    "flt" ~ WHITESPACE* ~
+    flt_var ~ ("," ~ flt_var)*
+}
+
+// end VARIABLES
+
+// NUMERICAL EXPRESSIONS
+
+term = _{ flt_value | "(" ~ expr ~ ")" }
+
+expr = {
+    term ~ WHITESPACE* ~
+    (
+        operation{1} ~ WHITESPACE* ~
+        term
+    )*
+}
+
+operation = _{ add | subtract | multiply | divide | power }
+    add      = { "+" }
+    subtract = { "-" }
+    multiply = { "*" }
+    divide   = { "/" }
+    power    = { "^" }
