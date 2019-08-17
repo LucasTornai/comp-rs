@@ -114,6 +114,30 @@ pub mod transpiler {
 
                     return AstNode::VariableDeclaration(nodes);
                 },
+                Rule::flt_decl => {
+                    let mut nodes = vec![];
+
+                    for inner_pair in pair.into_inner() {
+                        let mut pair = inner_pair.into_inner();
+                        let ident: pest::iterators::Pair<Rule> = pair.next().unwrap();
+                        let ident = String::from(ident.as_str());
+
+                        let value = match pair.next() {
+                            Some(v) => Some(String::from(v.as_str())),
+                            None => None
+                        };
+
+                        let node = Variable {
+                            var_type: String::from("float"),
+                            ident,
+                            value
+                        };
+
+                        nodes.push(node);
+                    }
+
+                    return AstNode::VariableDeclaration(nodes);
+                },
                 Rule::main_func => {
                     let mut ast = vec![];
 
