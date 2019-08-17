@@ -7,3 +7,7 @@ Compiler developed in Rust for the Compilers subject at Federal University of AB
 # Objective
 
 Create a transpiler for a fictional language to C language by implementing the features described in [milestone v1.0](https://github.com/gmurayama/comp-rs/milestone/1).
+
+# License
+
+This project is under the MIT License - see the [LICENSE](LICENSE) file for details.

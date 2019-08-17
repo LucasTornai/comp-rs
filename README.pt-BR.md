@@ -7,3 +7,7 @@ Compilador desenvolvido em Rust para a disciplina de Compiladores da Universidad
 # Objetivo
 
 Criar um transpilador de uma linguagem fictícia para a linguagem C implementando os recursos descritos no [milestone v1.0](https://github.com/gmurayama/comp-rs/milestone/1).
+
+# License
+
+Esse projeto está sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
