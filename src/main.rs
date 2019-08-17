@@ -2,18 +2,15 @@ extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
-use pest::Parser;
-use std::fs;
-use std::env;
+mod c_parser;
 
-#[derive(Parser)]
-#[grammar = "program.pest"]
-pub struct Analyzer;
+use c_parser::transpiler::LangC;
+use std::env;
 
 fn main() {
     let path = env::args().nth(1).unwrap();
-    let unparsed_file = fs::read_to_string(&path).expect("cannot read file");
 
-    let successful_parse = Analyzer::parse(Rule::program, &unparsed_file);
-    println!("{:?}", successful_parse.unwrap());
+    let ast = LangC::parse_to_ast(&path);
+    let parsed_to_c = LangC::parse_to_c(ast);
+    println!("{}", parsed_to_c);
 }
