@@ -1,0 +1,6 @@
+begin:
+
+str compiler = "rust"
+flt version = 0.1
+
+end
