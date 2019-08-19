@@ -3,14 +3,16 @@ extern crate pest;
 extern crate pest_derive;
 
 mod c_parser;
+mod ast_parser;
 
-use c_parser::transpiler::LangC;
+use c_parser::CParser;
+use ast_parser::AstParser;
 use std::env;
 
 fn main() {
     let path = env::args().nth(1).unwrap();
 
-    let ast = LangC::parse_to_ast(&path);
-    let parsed_to_c = LangC::parse_to_c(ast);
+    let ast = AstParser::parse(&path);
+    let parsed_to_c = CParser::parse(ast);
     println!("{}", parsed_to_c);
 }
