@@ -32,7 +32,7 @@ str_decl = {
 
 // :: FLOAT
 
-flt_value = {
+flt_value = @{
     ("+" | "-")? ~
     ASCII_DIGIT+ ~
     ("." ~ ASCII_DIGIT+)?

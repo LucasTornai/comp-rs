@@ -11,7 +11,7 @@ use std::env;
 
 fn main() {
     let path = env::args().nth(1).unwrap();
-
+    
     let ast = AstParser::parse(&path);
     let parsed_to_c = CParser::parse(ast);
     println!("{}", parsed_to_c);
