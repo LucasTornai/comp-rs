@@ -1,4 +1,4 @@
-WHITESPACE = _{ " " }
+WHITESPACE = _{ " " | "\t" }
 
 eoi = _{ !ANY }
 
@@ -6,7 +6,7 @@ program = _{ SOI ~ main_func ~ eoi }
 
 main_func = { 
     "begin:" ~ NEWLINE* ~
-    ((str_decl | flt_decl) ~ NEWLINE*)* ~
+    ((var_decl | condition_statement) ~ NEWLINE*)* ~
     "end"
 }
 
@@ -16,6 +16,10 @@ t_id = @{
 }
 
 // start VARIABLES
+
+var_decl = _{ flt_decl | str_decl }
+var = _{ flt_var | str_var }
+
 // :: STRING
 
 str_value = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
@@ -49,6 +53,32 @@ flt_decl = {
 }
 
 // end VARIABLES
+
+// LOGICAL STATEMENTS
+
+condition_statement = {
+    if_stmt ~ (WHITESPACE | NEWLINE)* ~
+    (else_stmt | if_stmt)*
+}
+
+if_stmt = {
+    "in case " ~ WHITESPACE* ~ 
+    boolean_expr ~ WHITESPACE* ~ "then:" ~ 
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    "end"
+}
+
+else_stmt = {
+    "otherwise:" ~ (WHITESPACE | NEWLINE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    "end"
+}
+
+boolean_expr = @{
+    (t_id | term) ~ WHITESPACE* ~ bool_operations ~ WHITESPACE* ~ (t_id | term)
+}
+
+bool_operations = { ">" | ">=" | "<" | "<=" | "==" | "!=" }
 
 // NUMERICAL EXPRESSIONS
 

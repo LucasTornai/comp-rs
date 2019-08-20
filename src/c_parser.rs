@@ -42,6 +42,28 @@ impl CParser {
                 };
 
                 return declarations;
+            },
+            AstNode::ConditionalStatement { bool_expr, body, else_stmt } => {
+                let mut if_body = String::new();
+
+                for ast_node in body {
+                    let expr = CParser::parse_to_c_expr(ast_node);
+                    if_body.push_str(&expr);
+                }
+
+                match else_stmt {
+                    Some(nodes) => {
+                        let mut else_body = String::new();
+
+                        for ast_node in nodes {
+                            let expr = CParser::parse_to_c_expr(ast_node);
+                            else_body.push_str(&expr);
+                        }
+
+                        format!("if ({}) {{ {} }} else {{ {} }}", bool_expr, if_body, else_body)
+                    },
+                    None => format!("if ({}) {{ {} }}", bool_expr, if_body)
+                }
             }
         }
     }
