@@ -8,7 +8,12 @@ pub struct Analyzer;
 #[derive(Debug)]
 pub enum AstNode {
     MainFunction(Vec<Box<AstNode>>),
-    VariableDeclaration (Vec<Variable>)
+    VariableDeclaration (Vec<Variable>),
+    ConditionalStatement {
+        bool_expr: String,
+        body: Vec<AstNode>,
+        else_stmt: Option<Vec<AstNode>>
+    }
 }
 
 #[derive(Debug)]
@@ -47,6 +52,8 @@ impl AstParser {
 
         let unparsed_file = fs::read_to_string(&path).expect("cannot read file");
         let pairs = Analyzer::parse(Rule::program, &unparsed_file).unwrap();
+
+        println!("{:#?}", pairs);
 
         for pair in pairs {
             let n = AstParser::parse_to_ast_node(pair);
@@ -165,7 +172,42 @@ impl AstParser {
                     nodes.push(node);
                 }
 
-                return AstNode::VariableDeclaration(nodes);
+                AstNode::VariableDeclaration(nodes)
+            },
+            Rule::condition_statement => {
+                let mut inner_pair = pair.into_inner();
+                let if_stmt = inner_pair.next().unwrap();
+
+                let mut if_stmt_inner = if_stmt.into_inner();
+                let bool_expr = if_stmt_inner.next().unwrap().as_str();
+                let bool_expr = String::from(bool_expr);
+
+                let mut if_body = vec![];
+
+                for pair in if_stmt_inner {
+                    let node = AstParser::parse_to_ast_node(pair);
+                    if_body.push(node);
+                }
+
+                let else_stmt = match inner_pair.next() {
+                    Some(p) => {
+                        let mut body = vec![];
+                        
+                        for pair in p.into_inner() {
+                            let node = AstParser::parse_to_ast_node(pair);
+                            body.push(node);
+                        }
+
+                        Some(body)
+                    },
+                    None => None
+                };
+                
+                AstNode::ConditionalStatement {
+                    bool_expr,
+                    body: if_body,
+                    else_stmt
+                }
             },
             Rule::main_func => {
                 let mut ast = vec![];
