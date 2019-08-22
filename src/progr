@@ -1,6 +1,17 @@
 begin:
 
-str compiler = "rust"
-flt version = 0.1
+str a = "test"
+flt b = 4.2
+
+flt b = 1.5
+
+during c < 1 do:
+flt c = a * 1
+end
+
+readstr a
+readnum b
+printstr a
+printnum b
 
 end
