@@ -129,11 +129,11 @@ read_num_stmt = {
 }
 
 print_string_stmt = {
-    "printstr " ~ WHITESPACE* ~ str_value ~ WHITESPACE ~ str_var
+    "printstr " ~ WHITESPACE* ~ str_var
 }
 
 print_num_stmt = {
-    "printnum " ~ WHITESPACE* ~ str_value ~ WHITESPACE* ~ flt_var
+    "printnum " ~ WHITESPACE* ~ flt_var
 }
 
 // end IO

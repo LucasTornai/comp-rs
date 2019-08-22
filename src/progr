@@ -3,6 +3,8 @@ begin:
 str a = "test"
 flt b = 4.2
 
+flt b = 1.5
+
 during c < 1 do:
 flt c = a * 1
 end
