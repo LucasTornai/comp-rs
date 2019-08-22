@@ -65,6 +65,16 @@ impl CParser {
                     None => format!("if ({}) {{ {} }}", bool_expr, if_body)
                 }
             }
+            AstNode::WhileStatement { bool_expr, body } => {
+                let mut while_body = String::new();
+
+                for ast_node in body {
+                    let expr = CParser::parse_to_c_expr(ast_node);
+                    while_body.push_str(&expr);
+                }
+
+                format!("while ({})  {{ {} }}", bool_expr, while_body)
+            }
         }
     }
 

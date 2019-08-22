@@ -6,7 +6,7 @@ program = _{ SOI ~ main_func ~ eoi }
 
 main_func = { 
     "begin:" ~ NEWLINE* ~
-    ((var_decl | condition_statement) ~ NEWLINE*)* ~
+    ((var_decl | condition_statement | while_statement) ~ NEWLINE*)* ~
     "end"
 }
 
@@ -64,15 +64,28 @@ condition_statement = {
 if_stmt = {
     "in case " ~ WHITESPACE* ~ 
     boolean_expr ~ WHITESPACE* ~ "then:" ~ 
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | expr))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
 else_stmt = {
     "otherwise:" ~ (WHITESPACE | NEWLINE)* ~
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | expr))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
+
+// end LOGICAL STATEMENTS
+
+// LOOP STATEMENTS
+
+while_statement = {
+    "during" ~ WHITESPACE* ~ 
+    boolean_expr ~ (WHITESPACE|NEWLINE)* ~ "do:" ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    "end" 
+}
+
+// end LOOP STATEMENTS
 
 boolean_expr = @{
     (t_id | term) ~ WHITESPACE* ~ bool_operations ~ WHITESPACE* ~ (t_id | term)

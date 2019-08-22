@@ -13,6 +13,10 @@ pub enum AstNode {
         bool_expr: String,
         body: Vec<AstNode>,
         else_stmt: Option<Vec<AstNode>>
+    },
+    WhileStatement {
+        bool_expr: String,
+        body: Vec<AstNode>
     }
 }
 
@@ -209,6 +213,24 @@ impl AstParser {
                     else_stmt
                 }
             },
+            Rule::while_statement => {
+                let mut while_stmt = pair.into_inner();
+
+                let bool_expr = while_stmt.next().unwrap().as_str();
+                let bool_expr = String::from(bool_expr);
+
+                let mut body = vec![];
+
+                for pair in while_stmt {
+                    let node = AstParser::parse_to_ast_node(pair);
+                    body.push(node);
+                }
+
+                AstNode::WhileStatement {
+                    bool_expr,
+                    body
+                }
+            }
             Rule::main_func => {
                 let mut ast = vec![];
 
