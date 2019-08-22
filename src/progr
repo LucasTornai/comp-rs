@@ -9,7 +9,7 @@ end
 
 readstr a
 readnum b
-printstr "" a
-printnum "" b
+printstr a
+printnum b
 
 end

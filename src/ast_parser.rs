@@ -1,5 +1,6 @@
 use pest::Parser;
 use std::fs;
+use std::collections::HashMap;
 
 #[derive(Parser)]
 #[grammar = "program.pest"]
@@ -60,9 +61,19 @@ pub enum IOFunc {
     PrintNum
 }
 
-pub struct AstParser;
+pub struct AstParser {
+    variables: HashMap<String, ValueType>
+}
 
 impl AstParser {
+    pub fn new_var(&mut self, ident: String, value: ValueType) {
+        if self.variables.contains_key(&ident) {
+            panic!("Variable {} already declared", ident);
+        } else {
+            self.variables.insert(ident, value);
+        }
+    }
+
     pub fn parse(path: &str) -> Vec<AstNode> {
         let mut ast = vec![];
 
@@ -167,7 +178,8 @@ impl AstParser {
                         ident,
                         value
                     };
-
+                    
+                    AstParser::new_var(ident, value.unwrap());
                     nodes.push(node);
                 }
 
