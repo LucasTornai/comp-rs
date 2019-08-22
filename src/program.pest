@@ -6,7 +6,7 @@ program = _{ SOI ~ main_func ~ eoi }
 
 main_func = { 
     "begin:" ~ NEWLINE* ~
-    ((var_decl | condition_statement | while_statement) ~ NEWLINE*)* ~
+    ((var_decl | condition_statement | while_statement | io_statement) ~ NEWLINE*)* ~
     "end"
 }
 
@@ -64,13 +64,13 @@ condition_statement = {
 if_stmt = {
     "in case " ~ WHITESPACE* ~ 
     boolean_expr ~ WHITESPACE* ~ "then:" ~ 
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | expr))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
 else_stmt = {
     "otherwise:" ~ (WHITESPACE | NEWLINE)* ~
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | expr))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
@@ -79,7 +79,7 @@ else_stmt = {
 // LOOP STATEMENTS
 
 while_statement = {
-    "during" ~ WHITESPACE* ~ 
+    "during " ~ WHITESPACE* ~ 
     boolean_expr ~ (WHITESPACE|NEWLINE)* ~ "do:" ~
     ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
     "end" 
@@ -95,7 +95,7 @@ bool_operations = { ">" | ">=" | "<" | "<=" | "==" | "!=" }
 
 // NUMERICAL EXPRESSIONS
 
-term = _{ flt_value | "(" ~ expr ~ ")" }
+term = _{ flt_value | t_id | "(" ~ expr ~ ")" }
 
 expr = {
     term ~ WHITESPACE* ~
@@ -111,3 +111,29 @@ operation = _{ add | subtract | multiply | divide | power }
     multiply = { "*" }
     divide   = { "/" }
     power    = { "^" }
+
+// end NUMERICAL EXPRESSIONS
+
+// IO
+
+io_statement = {
+    (read_string_stmt | read_num_stmt | print_string_stmt | print_num_stmt)
+}
+
+read_string_stmt = {
+    "readstr " ~ WHITESPACE* ~ str_var
+}
+
+read_num_stmt = {
+    "readnum " ~ WHITESPACE* ~ flt_var
+}
+
+print_string_stmt = {
+    "printstr " ~ WHITESPACE* ~ str_value ~ WHITESPACE ~ str_var
+}
+
+print_num_stmt = {
+    "printnum " ~ WHITESPACE* ~ str_value ~ WHITESPACE* ~ flt_var
+}
+
+// end IO

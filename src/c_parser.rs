@@ -1,4 +1,4 @@
-use crate::ast_parser::{ AstNode, ValueType, Expr };
+use crate::ast_parser::{ AstNode, ValueType, Expr, IOFunc };
 
 pub struct CParser;
 
@@ -73,7 +73,19 @@ impl CParser {
                     while_body.push_str(&expr);
                 }
 
-                format!("while ({})  {{ {} }}", bool_expr, while_body)
+                format!("
+                while ({})  
+                {{
+                    {}
+                }}\n", bool_expr, while_body)
+            }
+            AstNode::IOStatement { io_stmt, param } => {
+                match io_stmt {
+                    IOFunc::ReadStr => format!("scanf(\"%s\", &{})\n", param),
+                    IOFunc::ReadNum => format!("scanf(\"%f\", &{})\n", param),
+                    IOFunc::PrintStr => format!("printf(%s, {})\n", param),
+                    IOFunc::PrintNum => format!("printf(%d, {})\n", param)
+                }
             }
         }
     }
@@ -89,9 +101,9 @@ impl CParser {
                 for e in expr {
                     let parsed = match e {
                         Expr::Add => String::from("+"),
-                        Expr::Divide => String::from("+"),
-                        Expr::Multiply => String::from("+"),
-                        Expr::Subtract => String::from("+"),
+                        Expr::Divide => String::from("/"),
+                        Expr::Multiply => String::from("*"),
+                        Expr::Subtract => String::from("-"),
                         Expr::Power { base, exp } => {
                             let base = CParser::parse_variable_value(*base);
                             let exp = CParser::parse_variable_value(*exp);

@@ -17,6 +17,10 @@ pub enum AstNode {
     WhileStatement {
         bool_expr: String,
         body: Vec<AstNode>
+    },
+    IOStatement {
+        io_stmt: IOFunc,
+        param: String
     }
 }
 
@@ -48,6 +52,14 @@ pub enum Expr {
     Term(Box<ValueType>)
 }
 
+#[derive(Debug)]
+pub enum IOFunc {
+    ReadStr,
+    ReadNum,
+    PrintStr,
+    PrintNum
+}
+
 pub struct AstParser;
 
 impl AstParser {
@@ -77,6 +89,14 @@ impl AstParser {
                     Err(e) => panic!("Error converting {:?} to float - {:?}", pair.as_str(), e)
                 }
             },
+            Rule::t_id => {
+                let parsed_value = pair.as_str().parse::<String>();
+
+                match parsed_value {
+                    Ok(v) => ValueType::Ident(v),
+                    Err(e) => panic!("Error converting {:?} to ident - {:?}", pair.as_str(), e)
+                }
+            }
             Rule::expr => {
                 let mut expr: Vec<Expr> = vec![];
 
@@ -109,7 +129,6 @@ impl AstParser {
                                     Expr::Term(Box::new(value_type))
                                 }
                             };
-
                             expr.push(e);
                         },
                         None => break
@@ -230,7 +249,34 @@ impl AstParser {
                     bool_expr,
                     body
                 }
-            }
+            },
+            Rule::io_statement => {
+                let io_stmt: IOFunc;
+                let mut inner_pair = pair.into_inner();
+                let inner_pair_next = inner_pair.clone().next();
+
+                match inner_pair_next {
+                    Some(pair) => {
+                        let e = match pair.as_rule() {
+                            Rule::read_string_stmt => IOFunc::ReadStr,
+                            Rule::read_num_stmt => IOFunc::ReadNum,
+                            Rule::print_string_stmt => IOFunc::PrintStr,
+                            Rule::print_num_stmt => IOFunc::PrintNum,
+                            _ => panic!("Unexpected IO identifier")
+                        };
+                        io_stmt = e;
+                    },
+                    None => panic!("No IO identifier in IO statement")
+                }
+    
+                let param = inner_pair.next().unwrap().into_inner().next().unwrap().as_str();
+                let param = String::from(param);
+                
+                AstNode::IOStatement {
+                    io_stmt,
+                    param
+                }
+            },
             Rule::main_func => {
                 let mut ast = vec![];
 
