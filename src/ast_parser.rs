@@ -26,6 +26,9 @@ pub enum AstNode {
     IOStatement {
         io_stmt: IOFunc,
         param: String
+    },
+    PrintStatement {
+        printable: String
     }
 }
 
@@ -94,7 +97,14 @@ impl AstParser {
         let mut variables = HashMap::new();
 
         let unparsed_file = fs::read_to_string(&path).expect("cannot read file");
-        let pairs = Analyzer::parse(Rule::program, &unparsed_file).unwrap();
+        let parsed_file = Analyzer::parse(Rule::program, &unparsed_file);
+
+        match parsed_file {
+            Ok(_) => print!("Ok file!"),
+            Err(_) => panic!("Syntax error!")
+        }
+
+        let pairs = parsed_file.unwrap();
 
         println!("{:#?}", pairs);
 
@@ -183,7 +193,7 @@ impl AstParser {
                          Some(ValueType::Str(String::from(v.as_str())))
                     },
                     None => {
-                        ident = format!("{}[0]", ident);
+                        ident = format!("{}", ident);
                         None
                     }
                 };
@@ -228,7 +238,7 @@ impl AstParser {
             },
             Rule::str_assign => {
                 let mut inner_pair = pair.into_inner();
-                print!("{}",&inner_pair);
+                
                 let ident = inner_pair.next().unwrap();
                 let ident = String::from(ident.as_str());
 
@@ -250,7 +260,7 @@ impl AstParser {
             },
             Rule::flt_assign => {
                 let mut inner_pair = pair.into_inner();
-                print!("{}",&inner_pair);
+
                 let ident = inner_pair.next().unwrap();
                 let ident = String::from(ident.as_str());
 
@@ -344,6 +354,16 @@ impl AstParser {
                 AstNode::IOStatement {
                     io_stmt,
                     param
+                }
+            },
+            Rule::print_stmt => {
+                let mut inner_pair = pair.into_inner();
+
+                let printable = inner_pair.next().unwrap().as_str();
+                let printable = String::from(printable);
+
+                AstNode::PrintStatement {
+                    printable
                 }
             },
             Rule::main_func => {

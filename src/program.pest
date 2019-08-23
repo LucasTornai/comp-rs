@@ -6,7 +6,7 @@ program = _{ SOI ~ main_func ~ eoi }
 
 main_func = { 
     "begin:" ~ NEWLINE* ~
-    ((var_decl | var_assign | condition_statement | while_statement | io_statement) ~ NEWLINE*)* ~
+    ((var_decl | var_assign | condition_statement | while_statement | io_statement | print_stmt) ~ NEWLINE*)* ~
     "end"
 }
 
@@ -26,7 +26,7 @@ str_value = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 
 str_decl = {
     "str" ~ WHITESPACE* ~
-    t_id ~ "=" ~ str_value
+    t_id ~ ("=" ~ str_value)?
 }
 
 str_assign = {
@@ -43,7 +43,7 @@ flt_value = @{
 
 flt_decl = {
     "flt" ~ WHITESPACE* ~
-    t_id ~ "=" ~ expr
+    t_id ~ ("=" ~ expr)?
 }
 
 flt_assign = {
@@ -62,13 +62,13 @@ condition_statement = {
 if_stmt = {
     "in case " ~ WHITESPACE* ~ 
     boolean_expr ~ WHITESPACE* ~ "then:" ~ 
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign | io_statement | print_stmt))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
 else_stmt = {
     "otherwise:" ~ (WHITESPACE | NEWLINE)* ~
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign | io_statement | print_stmt))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
@@ -79,7 +79,7 @@ else_stmt = {
 while_statement = {
     "during " ~ WHITESPACE* ~ 
     boolean_expr ~ (WHITESPACE|NEWLINE)* ~ "do:" ~
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign | io_statement | print_stmt))* ~ (NEWLINE | WHITESPACE)* ~
     "end" 
 }
 
@@ -135,7 +135,7 @@ print_num_stmt = {
 }
 
 print_stmt = {
-    "print" ~ WHITESPACE* ~ str_value
+    "print " ~ WHITESPACE* ~ str_value
 }
 
 // end IO

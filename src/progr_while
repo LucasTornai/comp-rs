@@ -1,0 +1,10 @@
+begin:
+
+flt p1 = 1
+
+during p1 < 10 do:
+p1 = p1 + 1
+printnum p1
+end
+
+end

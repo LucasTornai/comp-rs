@@ -1,0 +1,16 @@
+begin:
+
+flt p1
+flt p2
+
+print "Insira a nota da P1\n"
+readnum p1
+print "Insira a nota da P2\n"
+readnum p2
+
+flt p3 = (p1 + p2) / 2
+
+print "A média é\n"
+printnum p3
+
+end

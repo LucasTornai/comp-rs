@@ -3,6 +3,7 @@ begin:
 flt c = 1 + 1
 flt d = 2.22
 str e = "aeae"
+str a = "bb"
 
 in case c < 10 then:
 c = 5

@@ -44,8 +44,8 @@ impl CParser {
                 return declarations;
             },
             AstNode::VariableAssignment { ident, value } => {
-                format!("{} = {}\n", ident, CParser::parse_variable_value(value.unwrap()))
-            }
+                format!("{} = {};\n", ident, CParser::parse_variable_value(value.unwrap()))
+            },
             AstNode::ConditionalStatement { bool_expr, body, else_stmt } => {
                 let mut if_body = String::new();
 
@@ -67,7 +67,7 @@ impl CParser {
                     },
                     None => format!("if ({}) {{ {} }}\n", bool_expr, if_body)
                 }
-            }
+            },
             AstNode::WhileStatement { bool_expr, body } => {
                 let mut while_body = String::new();
 
@@ -81,14 +81,17 @@ impl CParser {
                 {{
                     {}
                 }}\n", bool_expr, while_body)
-            }
+            },
             AstNode::IOStatement { io_stmt, param } => {
                 match io_stmt {
-                    IOFunc::ReadStr => format!("scanf(\"%s\", &{})\n", param),
-                    IOFunc::ReadNum => format!("scanf(\"%f\", &{})\n", param),
-                    IOFunc::PrintStr => format!("printf(%s, {})\n", param),
-                    IOFunc::PrintNum => format!("printf(%d, {})\n", param)
+                    IOFunc::ReadStr => format!("scanf(\"%s\", &{});\n", param),
+                    IOFunc::ReadNum => format!("scanf(\"%f\", &{});\n", param),
+                    IOFunc::PrintStr => format!("printf(\"%s\", {});\n", param),
+                    IOFunc::PrintNum => format!("printf(\"%f\", {});\n", param)
                 }
+            },
+            AstNode::PrintStatement { printable } => {
+                format!("printf({});\n", printable)
             }
         }
     }
