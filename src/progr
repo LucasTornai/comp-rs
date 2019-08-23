@@ -1,17 +1,32 @@
 begin:
 
-str a = "test"
-flt b = 4.2
+flt c = 1 + 1
+flt d = 2.22
+str e = "aeae"
 
-flt b = 1.5
-
-during c < 1 do:
-flt c = a * 1
+in case c < 10 then:
+c = 5
+end
+otherwise:
+c = 10
 end
 
-readstr a
-readnum b
-printstr a
-printnum b
+in case c < 5 then:
+e = "bbb"
+end
+
+during c < 10 do:
+c = c + 1
+end
+
+a = "aeae"
+c = 1
+
+c = c + 1
+
+readstr l
+readnum p
+printstr l
+printnum p
 
 end

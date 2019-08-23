@@ -6,7 +6,7 @@ program = _{ SOI ~ main_func ~ eoi }
 
 main_func = { 
     "begin:" ~ NEWLINE* ~
-    ((var_decl | condition_statement | while_statement | io_statement) ~ NEWLINE*)* ~
+    ((var_decl | var_assign | condition_statement | while_statement | io_statement) ~ NEWLINE*)* ~
     "end"
 }
 
@@ -18,20 +18,19 @@ t_id = @{
 // start VARIABLES
 
 var_decl = _{ flt_decl | str_decl }
-var = _{ flt_var | str_var }
+var_assign = _{ flt_assign | str_assign }
 
 // :: STRING
 
 str_value = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 
-str_var = {
-    t_id ~ WHITESPACE* ~
-    ("=" ~ WHITESPACE* ~ str_value)?
-}
-
 str_decl = {
     "str" ~ WHITESPACE* ~
-    str_var ~ ("," ~ str_var)*
+    t_id ~ "=" ~ str_value
+}
+
+str_assign = {
+    t_id ~ WHITESPACE* ~ "=" ~ str_value
 }
 
 // :: FLOAT
@@ -42,14 +41,13 @@ flt_value = @{
     ("." ~ ASCII_DIGIT+)?
 }
 
-flt_var = {
-    t_id ~ WHITESPACE* ~
-    ("=" ~ WHITESPACE* ~ expr)?
-}
-
 flt_decl = {
     "flt" ~ WHITESPACE* ~
-    flt_var ~ ("," ~ flt_var)*
+    t_id ~ "=" ~ expr
+}
+
+flt_assign = {
+    t_id ~ WHITESPACE* ~ "=" ~ expr
 }
 
 // end VARIABLES
@@ -64,13 +62,13 @@ condition_statement = {
 if_stmt = {
     "in case " ~ WHITESPACE* ~ 
     boolean_expr ~ WHITESPACE* ~ "then:" ~ 
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
 else_stmt = {
     "otherwise:" ~ (WHITESPACE | NEWLINE)* ~
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign))* ~ (NEWLINE | WHITESPACE)* ~
     "end"
 }
 
@@ -81,7 +79,7 @@ else_stmt = {
 while_statement = {
     "during " ~ WHITESPACE* ~ 
     boolean_expr ~ (WHITESPACE|NEWLINE)* ~ "do:" ~
-    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl))* ~ (NEWLINE | WHITESPACE)* ~
+    ((NEWLINE | WHITESPACE)* ~ (condition_statement | var_decl | var_assign))* ~ (NEWLINE | WHITESPACE)* ~
     "end" 
 }
 
@@ -121,19 +119,23 @@ io_statement = {
 }
 
 read_string_stmt = {
-    "readstr " ~ WHITESPACE* ~ str_var
+    "readstr " ~ WHITESPACE* ~ t_id
 }
 
 read_num_stmt = {
-    "readnum " ~ WHITESPACE* ~ flt_var
+    "readnum " ~ WHITESPACE* ~ t_id
 }
 
 print_string_stmt = {
-    "printstr " ~ WHITESPACE* ~ str_var
+    "printstr " ~ WHITESPACE* ~ t_id
 }
 
 print_num_stmt = {
-    "printnum " ~ WHITESPACE* ~ flt_var
+    "printnum " ~ WHITESPACE* ~ t_id
+}
+
+print_stmt = {
+    "print" ~ WHITESPACE* ~ str_value
 }
 
 // end IO

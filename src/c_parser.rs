@@ -43,6 +43,9 @@ impl CParser {
 
                 return declarations;
             },
+            AstNode::VariableAssignment { ident, value } => {
+                format!("{} = {}\n", ident, CParser::parse_variable_value(value.unwrap()))
+            }
             AstNode::ConditionalStatement { bool_expr, body, else_stmt } => {
                 let mut if_body = String::new();
 
@@ -60,9 +63,9 @@ impl CParser {
                             else_body.push_str(&expr);
                         }
 
-                        format!("if ({}) {{ {} }} else {{ {} }}", bool_expr, if_body, else_body)
+                        format!("if ({}) {{ {} }} else {{ {} }}\n", bool_expr, if_body, else_body)
                     },
-                    None => format!("if ({}) {{ {} }}", bool_expr, if_body)
+                    None => format!("if ({}) {{ {} }}\n", bool_expr, if_body)
                 }
             }
             AstNode::WhileStatement { bool_expr, body } => {

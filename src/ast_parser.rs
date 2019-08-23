@@ -10,6 +10,10 @@ pub struct Analyzer;
 pub enum AstNode {
     MainFunction(Vec<Box<AstNode>>),
     VariableDeclaration (Vec<Variable>),
+    VariableAssignment {
+        ident: String,
+        value: Option<ValueType>
+    },
     ConditionalStatement {
         bool_expr: String,
         body: Vec<AstNode>,
@@ -69,6 +73,19 @@ impl AstParser {
             panic!("Variable {} already declared", ident);
         } else {
             variables.insert(ident.to_string(), var_type.to_string());
+        }
+    }
+
+    pub fn assign_var(variables: &mut HashMap<String, String>, ident: &String, var_type: &String) {
+        if variables.contains_key(ident) {
+            let old_type = variables.get(ident).unwrap();
+            if old_type != var_type {
+                panic!("Trying to assign value of type {} to variable {} of type {}", var_type, ident, old_type);
+            } else {
+                return
+            }
+        } else {
+            panic!("Variable {} was not initialized", ident);
         }
     }
 
@@ -156,62 +173,98 @@ impl AstParser {
             Rule::str_decl => {
                 let mut nodes = vec![];
 
-                for inner_pair in pair.into_inner() {
-                    let mut pair = inner_pair.into_inner();
-                    let ident: pest::iterators::Pair<Rule> = pair.next().unwrap();
-                    let mut ident = String::from(ident.as_str());
+                let mut inner_pair = pair.into_inner();
+                let ident = inner_pair.next().unwrap();
+                let mut ident = String::from(ident.as_str());
 
-                    let value = match pair.next() {
-                        Some(v) => {
-                            ident = format!("{}[]", ident);
-                            Some(ValueType::Str(String::from(v.as_str())))
-                        },
-                        None => {
-                            ident = format!("{}[0]", ident);
-                            None
-                        }
-                    };
+                let value = match inner_pair.next() {
+                    Some(v) => {
+                         ident = format!("{}", ident);
+                         Some(ValueType::Str(String::from(v.as_str())))
+                    },
+                    None => {
+                        ident = format!("{}[0]", ident);
+                        None
+                    }
+                };
 
-                    let var_type = String::from("char");
+                let var_type = String::from("char*");
 
-                    let node = Variable {
-                        var_type: var_type.clone(),
-                        ident: ident.clone(),
-                        value
-                    };
+                let node = Variable {
+                    var_type: var_type.clone(),
+                    ident: ident.clone(),
+                    value
+                };
                     
-                    AstParser::new_var(variables, &ident, &var_type);
-                    nodes.push(node);
-                }
+                AstParser::new_var(variables, &ident, &var_type);
+                nodes.push(node);
 
                 return AstNode::VariableDeclaration(nodes);
             },
             Rule::flt_decl => {
                 let mut nodes = vec![];
 
-                for inner_pair in pair.into_inner() {
-                    let mut pair = inner_pair.into_inner();
-                    let ident: pest::iterators::Pair<Rule> = pair.next().unwrap();
-                    let ident = String::from(ident.as_str());
+                let mut inner_pair = pair.into_inner();
+                let ident = inner_pair.next().unwrap();
+                let ident = String::from(ident.as_str());
 
-                    let value = match pair.next() {
-                        Some(p) => Some(AstParser::parse_numerical_expr(p)),
-                        None => None
-                    };
+                let value = match inner_pair.next() {
+                    Some(p) => Some(AstParser::parse_numerical_expr(p)),
+                    None => None
+                };
 
-                    let var_type = String::from("float");
+                let var_type = String::from("float");
 
-                    let node = Variable {
-                        var_type: var_type.clone(),
-                        ident: ident.clone(),
-                        value
-                    };
+                let node = Variable {
+                    var_type: var_type.clone(),
+                    ident: ident.clone(),
+                    value
+                };
 
-                    AstParser::new_var(variables, &ident, &var_type);
-                    nodes.push(node);
-                }
+                AstParser::new_var(variables, &ident, &var_type);
+                nodes.push(node);
 
                 AstNode::VariableDeclaration(nodes)
+            },
+            Rule::str_assign => {
+                let mut inner_pair = pair.into_inner();
+                print!("{}",&inner_pair);
+                let ident = inner_pair.next().unwrap();
+                let ident = String::from(ident.as_str());
+
+                AstParser::assign_var(variables, &ident, &String::from("char*"));
+
+                let value = match inner_pair.next() {
+                    Some(v) => {
+                         Some(ValueType::Str(String::from(v.as_str())))
+                    },
+                    None => {
+                        panic!("No value in string variable {} assignment!", ident)
+                    }
+                };
+
+                AstNode::VariableAssignment {
+                    ident,
+                    value
+                }
+            },
+            Rule::flt_assign => {
+                let mut inner_pair = pair.into_inner();
+                print!("{}",&inner_pair);
+                let ident = inner_pair.next().unwrap();
+                let ident = String::from(ident.as_str());
+
+                AstParser::assign_var(variables, &ident, &String::from("float"));
+
+                let value = match inner_pair.next() {
+                    Some(p) => Some(AstParser::parse_numerical_expr(p)),
+                    None => panic!("No value in float variable {} assignment!", ident)
+                };
+
+                AstNode::VariableAssignment {
+                    ident,
+                    value
+                }
             },
             Rule::condition_statement => {
                 let mut inner_pair = pair.into_inner();
