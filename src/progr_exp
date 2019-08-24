@@ -1,0 +1,7 @@
+begin:
+
+flt c = 2 ^ 4
+
+printnum c
+
+end
